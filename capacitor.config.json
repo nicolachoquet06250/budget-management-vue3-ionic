@@ -1,0 +1,6 @@
+{
+  "appId": "fr.nicolas.choquet.budget.management.app",
+  "appName": "budget-management",
+  "webDir": "dist",
+  "bundledWebRuntime": false
+}

@@ -6,9 +6,7 @@
       <ion-menu side="start" type="push" menu-id="menu" content-id="main">
         <ion-header>
           <ion-toolbar color="danger" :style="sidebarToolbarTheme()">
-            <ion-title>
-              End Menu
-            </ion-title>
+            <ion-title> Menu </ion-title>
           </ion-toolbar>
         </ion-header>
 

@@ -5,8 +5,6 @@
         <ion-menu-button menu="menu"></ion-menu-button>
 
         <ion-title> {{ pageTitle }} </ion-title>
-
-        <!--<Menu />-->
       </ion-toolbar>
     </ion-header>
 
@@ -17,7 +15,6 @@
 </template>
 
 <script setup>
-  // import Menu from '@/components/Menu.vue';
   import { useTheme } from '@/hooks';
 
   const { bgPrimary, colorPrimary, bgSecondary, colorSecondary } = useTheme();

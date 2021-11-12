@@ -5,8 +5,6 @@
         <ion-menu-button menu="menu"></ion-menu-button>
 
         <ion-title> {{ pageTitle }} </ion-title>
-
-        <!--<Menu />-->
       </ion-toolbar>
     </ion-header>
 
@@ -15,21 +13,12 @@
       <p> 
         Si vous vous perdez, les documents <a href="https://ionicframework.com/docs"> </a> seront votre guide. 
       </p>
-
-      <!--<p>
-        localStorage 'test' key => <strong>{{ data }}</strong>
-      </p>
-
-      <div style="display: flex; justify-content: center;">
-        <ion-button @click="remove">Remove local storage</ion-button>
-      </div>-->
     </ion-content>
   </ion-app>
 </template>
 
 <script setup>
 // @ is an alias to /src
-// import Menu from '@/components/Menu.vue';
 import { useTheme } from '@/hooks';
 
 const { bgPrimary, colorPrimary, bgSecondary, colorSecondary } = useTheme();

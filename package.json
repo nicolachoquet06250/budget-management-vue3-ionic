@@ -6,8 +6,10 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "ionic:android:create": "npm run build && npx cap add android && echo 'Votre projet android est prêt, ouvrez le dans Android-Studio.'",
-    "ionic:android:update": "npm run build && npx cap copy && echo 'Votre projet android est prêt, ouvrez le dans Android-Studio.'"
+    "npm:ionic:android:create": "npm run build && npx cap add android && echo 'Votre projet android est prêt, ouvrez le dans Android-Studio.'",
+    "npm:ionic:android:update": "npm run build && npx cap copy && echo 'Votre projet android est prêt, ouvrez le dans Android-Studio.'",
+    "pnpm:ionic:android:create": "pnpm run build && npx cap add android && echo 'Votre projet android est prêt, ouvrez le dans Android-Studio.'",
+    "pnpm:ionic:android:update": "pnpm run build && npx cap copy && echo 'Votre projet android est prêt, ouvrez le dans Android-Studio.'"
   },
   "dependencies": {
     "@capacitor/android": "^3.3.0",

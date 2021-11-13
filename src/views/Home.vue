@@ -9,22 +9,93 @@
     </ion-header>
 
     <ion-content padding="" id="main">
-      Le monde est ton huître.
-      <p> 
-        Si vous vous perdez, les documents <a href="https://ionicframework.com/docs"> </a> seront votre guide. 
-      </p>
+      <ion-grid>
+        <ion-row>
+          <div v-for="item in header" :key="item" 
+               style="display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1">
+            <template v-if="typeof item === 'string'"> {{ item }} </template>
+
+            <template v-else>
+              <span v-for="subItem in item" :key="subItem">
+                {{ subItem }} 
+              </span>
+            </template>
+          </div>
+        </ion-row>
+
+        <ion-row v-for="montant in montants" :key="montant">
+          <div :style="{
+            color: (montant.status ? 'green' : 'red'),
+            display: 'flex', 
+            'flex-direction': 'column', 
+            'align-items': 'center', 
+            'justify-content': 'center', 
+            flex: 1, 
+            width: 'auto'
+          }" >
+            {{ montant.sold }}
+          </div>
+
+          <div :style="{
+            display: 'flex', 
+            'align-items': 'center', 
+            'justify-content': 'space-around', 
+            flex: 1, 
+            width: '50%',
+            'padding-top': '5px',
+            'padding-bottom': '5px'
+          }">
+            <ion-button color="medium" size="small" @click="openModal">
+              <ion-icon src="https://unpkg.com/ionicons@5.5.2/dist/svg/pencil-outline.svg" 
+                        style="color: black;"></ion-icon>
+            </ion-button>
+
+            <ion-button color="medium" size="small">
+              <ion-icon src="https://unpkg.com/ionicons@5.5.2/dist/svg/trash-outline.svg" 
+                        style="color: black;"></ion-icon>
+            </ion-button>
+          </div>
+        </ion-row>
+      </ion-grid>
     </ion-content>
   </ion-app>
 </template>
 
 <script setup>
 // @ is an alias to /src
-import { useTheme } from '@/hooks';
+import { ref } from 'vue';
+import { useTheme, useModal } from '@/hooks';
 
 const { bgPrimary, colorPrimary, bgSecondary, colorSecondary } = useTheme();
+const $modal = useModal();
 
 const pageTitle = 'Mon budget';
 
+const PLUS = true;
+const MOINS = false;
+
+const header = [
+  [
+    'Montant',
+    '( en € )'
+  ],
+  'Actions' 
+];
+
+const montants = ref([
+  {
+    sold: 2500,
+    status: PLUS
+  },
+  {
+    sold: 730,
+    status: MOINS 
+  }
+]);
+
+const openModal = () => {
+  $modal.setOpen(true);
+}
 </script>
 
 <style>
@@ -39,37 +110,45 @@ const pageTitle = 'Mon budget';
   ion-title {
     max-width: 100%;
   }
+
+  ion-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  } 
 </style>
 
-<style scoped>
+<style lang="scss" scoped>
+  .dark {
+    ion-toolbar {
+      --ion-color-md-primary: v-bind(bgPrimary[true]);
+      --ion-color-primary: v-bind(bgPrimary[true]);
 
-  .dark ion-toolbar {
-    --ion-color-md-primary: v-bind(bgPrimary[true]);
-    --ion-color-primary: v-bind(bgPrimary[true]);
+      --ion-color-md-primary-contrast: v-bind(colorPrimary[true]);
+      --ion-color-primary-contrast: v-bind(colorPrimary[true]);
 
-    --ion-color-md-primary-contrast: v-bind(colorPrimary[true]);
-    --ion-color-primary-contrast: v-bind(colorPrimary[true]);
+      --ion-text-color: v-bind(colorPrimary[true]);
+      --ion-text-md-color: v-bind(colorPrimary[true]);
 
-    --ion-text-color: v-bind(colorPrimary[true]);
-    --ion-text-md-color: v-bind(colorPrimary[true]);
+      --ion-background-md-color: v-bind(bgPrimary[true]);
+      --ion-background-color: v-bind(bgPrimary[true]);
+    }
 
-    --ion-background-md-color: v-bind(bgPrimary[true]);
-    --ion-background-color: v-bind(bgPrimary[true]);
-  }
+    ion-content {
+      --ion-color-md-primary: v-bind(bgSecondary[true]);
+      --ion-color-primary: v-bind(bgSecondary[true]);
 
-  .dark ion-content {
-    --ion-color-md-primary: v-bind(bgSecondary[true]);
-    --ion-color-primary: v-bind(bgSecondary[true]);
+      --ion-color-md-primary-contrast: v-bind(colorSecondary[true]);
+      --ion-color-primary-contrast: v-bind(colorSecondary[true]);
 
-    --ion-color-md-primary-contrast: v-bind(colorSecondary[true]);
-    --ion-color-primary-contrast: v-bind(colorSecondary[true]);
+      --ion-text-color: v-bind(colorSecondary[true]);
+      --ion-text-md-color: v-bind(colorSecondary[true]);
 
-    --ion-text-color: v-bind(colorSecondary[true]);
-    --ion-text-md-color: v-bind(colorSecondary[true]);
-
-    --ion-background-md-color: v-bind(bgSecondary[true]);
-    --ion-background-color: v-bind(bgSecondary[true]);
-  }
+      --ion-background-md-color: v-bind(bgSecondary[true]);
+      --ion-background-color: v-bind(bgSecondary[true]);
+    }
+  } 
 
   ion-toolbar {
     --ion-color-md-primary: v-bind(bgPrimary[false]);

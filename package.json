@@ -16,6 +16,7 @@
     "@capacitor/cli": "^3.3.0",
     "@capacitor/core": "^3.3.0",
     "@capacitor/electron": "^2.5.0",
+    "@ionic/vue": "^5.8.5",
     "@vueuse/core": "^6.7.6",
     "babel-loader": "^8.2.3",
     "core-js": "^3.6.5",

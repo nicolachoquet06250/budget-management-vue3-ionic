@@ -14,7 +14,7 @@ export const useTheme = () => {
         
         colorPrimary: {
             [DARK]: 'white',
-            [LIGHT]: 'gray'
+            [LIGHT]: 'white'
         }, 
         colorSecondary: {
             [DARK]: 'gray',

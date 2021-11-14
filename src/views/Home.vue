@@ -23,7 +23,7 @@
           </div>
         </ion-row>
 
-        <ion-row v-for="montant in montants" :key="montant">
+        <ion-row v-for="(montant, id) in montants" :key="montant">
           <div :style="{
             color: (montant.status ? 'green' : 'red'),
             display: 'flex', 
@@ -50,7 +50,7 @@
                         style="color: black;"></ion-icon>
             </ion-button>
 
-            <ion-button color="medium" size="small">
+            <ion-button color="medium" size="small" @click="delMontant(id)">
               <ion-icon src="https://unpkg.com/ionicons@5.5.2/dist/svg/trash-outline.svg" 
                         style="color: black;"></ion-icon>
             </ion-button>
@@ -58,40 +58,57 @@
         </ion-row>
       </ion-grid>
     </ion-content>
+
+    <ion-footer>
+      <ion-grid>
+        <ion-row>
+          <ion-col>
+            <ion-item>
+              <ion-label position="floating" 
+                          :color="isDark ? 'light' : 'dark'"> Montant </ion-label>
+              <ion-input inputmode="numeric" :value="montant" @input="montant = $event.target.value ? parseInt($event.target.value) : ''"></ion-input>
+            </ion-item>
+          </ion-col>
+
+          <ion-col>
+            <IonToggle style="display: none;"></IonToggle>
+
+            <Toggle v-model="toggleStatus" value="+" />
+          </ion-col>
+
+          <ion-col>
+            <ion-button @click="addMontantLocal">
+              <ion-icon src="https://unpkg.com/ionicons@5.5.2/dist/svg/add-circle-outline.svg"></ion-icon>
+            </ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-footer>
   </ion-app>
 </template>
 
 <script setup>
 // @ is an alias to /src
 import { ref } from 'vue';
-import { useTheme, useModal } from '@/hooks';
+import { IonToggle, IonItem, IonInput, IonLabel } from '@ionic/vue';
+import Toggle from '@/components/Toggle.vue';
+import { useTheme, useModal, useMontants } from '@/hooks';
 
 const { bgPrimary, colorPrimary, bgSecondary, colorSecondary } = useTheme();
 const $modal = useModal();
+const { montantsList: montants, montantsHeader: header, delMontant, addMontant } = useMontants();
 
 const pageTitle = 'Mon budget';
 
-const PLUS = true;
-const MOINS = false;
+const toggleStatus = ref(true);
+const montant = ref('');
 
-const header = [
-  [
-    'Montant',
-    '( en € )'
-  ],
-  'Actions' 
-];
+const addMontantLocal = () => {
+  addMontant(montant.value, toggleStatus.value);
 
-const montants = ref([
-  {
-    sold: 2500,
-    status: PLUS
-  },
-  {
-    sold: 730,
-    status: MOINS 
-  }
-]);
+  montant.value = 0;
+  toggleStatus.value = true;
+};
 
 const openModal = () => {
   $modal.setOpen(true);
@@ -99,6 +116,11 @@ const openModal = () => {
 </script>
 
 <style>
+  .toggle {
+    --ion-item-md-border-color-rgb:242,84,84; 
+    --ion-background-md-color: #f04141;
+  }
+
   .toolbar-content {
     display: flex;
     flex-direction: row;

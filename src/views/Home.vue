@@ -23,39 +23,59 @@
           </div>
         </ion-row>
 
-        <ion-row v-for="(montant, id) in montants" :key="montant">
-          <div :style="{
-            color: (montant.status ? 'green' : 'red'),
-            display: 'flex', 
-            'flex-direction': 'column', 
-            'align-items': 'center', 
-            'justify-content': 'center', 
-            flex: 1, 
-            width: 'auto'
-          }" >
-            {{ montant.sold }}
-          </div>
+        <template v-if="montants.length > 0">
+          <ion-row v-for="(montant, id) in montants" :key="montant">
+            <div :style="{
+              color: (montant.status ? 'green' : 'red'),
+              display: 'flex', 
+              'flex-direction': 'column', 
+              'align-items': 'center', 
+              'justify-content': 'center', 
+              flex: 1, 
+              width: 'auto'
+            }" >
+              {{ montant.sold }} €
+            </div>
 
-          <div :style="{
-            display: 'flex', 
-            'align-items': 'center', 
-            'justify-content': 'space-around', 
-            flex: 1, 
-            width: '50%',
-            'padding-top': '5px',
-            'padding-bottom': '5px'
-          }">
-            <ion-button color="medium" size="small" @click="openModal">
-              <ion-icon src="https://unpkg.com/ionicons@5.5.2/dist/svg/pencil-outline.svg" 
-                        style="color: black;"></ion-icon>
-            </ion-button>
+            <div :style="{
+              display: 'flex', 
+              'align-items': 'center', 
+              'justify-content': 'space-around', 
+              flex: 1, 
+              width: '50%',
+              'padding-top': '5px',
+              'padding-bottom': '5px'
+            }">
+              <ion-button color="medium" size="small" @click="openModal(id, montant.sold, montant.status)">
+                <ion-icon src="https://unpkg.com/ionicons@5.5.2/dist/svg/pencil-outline.svg" 
+                          style="color: black;"></ion-icon>
+              </ion-button>
 
-            <ion-button color="medium" size="small" @click="delMontant(id)">
-              <ion-icon src="https://unpkg.com/ionicons@5.5.2/dist/svg/trash-outline.svg" 
-                        style="color: black;"></ion-icon>
-            </ion-button>
-          </div>
-        </ion-row>
+              <ion-button color="medium" size="small" @click="delMontant(id)">
+                <ion-icon src="https://unpkg.com/ionicons@5.5.2/dist/svg/trash-outline.svg" 
+                          style="color: black;"></ion-icon>
+              </ion-button>
+            </div>
+          </ion-row>
+
+          <ion-row style="height: 60px; font-size: 30px;">
+            <ion-col style="display: flex; justify-content: center; align-items: center;">
+              Total
+            </ion-col>
+            
+            <ion-col style="display: flex; justify-content: center; align-items: center;">
+              <strong :style="{color: (total < 0 ? 'red' : 'green')}"> {{ Math.abs(total) }} € </strong>
+            </ion-col>
+          </ion-row>
+        </template>
+
+        <template v-else>
+          <ion-row>
+            <ion-col>
+              <strong> Aucun solde saisis ce mois-ci ! </strong>
+            </ion-col>
+          </ion-row>
+        </template>
       </ion-grid>
     </ion-content>
 
@@ -92,12 +112,14 @@
 import { ref } from 'vue';
 import { IonToggle, IonItem, IonInput, IonLabel } from '@ionic/vue';
 import Toggle from '@/components/Toggle.vue';
-import { useTheme, useModal, useMontants, useToast } from '@/hooks';
+import { useTheme, useUpdateSoldModal, useMontants, useToast } from '@/hooks';
 
 const { bgPrimary, colorPrimary, bgSecondary, colorSecondary } = useTheme();
-const $modal = useModal();
-const { montantsList: montants, montantsHeader: header, delMontant, addMontant } = useMontants();
+const $modal = useUpdateSoldModal();
+const { montantsList: montants, montantsHeader: header, total, delMontant, addMontant, actualizeMontants } = useMontants();
 const { openToast } = useToast();
+
+actualizeMontants();
 
 const pageTitle = 'Mon budget';
 
@@ -112,11 +134,14 @@ const addMontantLocal = () => {
 
   addMontant(montant.value, toggleStatus.value);
 
-  montant.value = 0;
+  montant.value = '';
   toggleStatus.value = true;
 };
 
-const openModal = () => {
+const openModal = (id, sold, status) => {
+  $modal.setSold(sold);
+  $modal.setStatus(status);
+  $modal.setId(id);
   $modal.setOpen(true);
 }
 </script>

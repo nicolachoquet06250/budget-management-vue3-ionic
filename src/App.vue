@@ -59,7 +59,7 @@
                 <ion-item>
                   <ion-label position="floating" 
                              :color="isDark ? 'light' : 'dark'"> Montant </ion-label>
-                  <ion-input inputmode="numeric" :value="montant" @input="montant = parseInt($event.target.value)"></ion-input>
+                  <ion-input inputmode="numeric" :value="montant" @input="montant = $event.target.value ? parseInt($event.target.value) : ''"></ion-input>
                 </ion-item>
 
                 <ion-item>
@@ -83,23 +83,30 @@
           </div>
         </ion-content>
       </ion-modal>
+
+      <ion-toast
+        :is-open="toast.opened"
+        :message="toast.message"
+        :duration="toast.duration"
+      ></ion-toast>
     </ion-content>
   </ion-app>
 </template>
 
 <script setup>
-import { IonLabel, IonList, IonItem, IonButton, IonInput, IonToggle } from '@ionic/vue';
+import { IonLabel, IonList, IonItem, IonButton, IonInput, IonToggle, IonToast } from '@ionic/vue';
 import Toggle from '@/components/Toggle.vue';
 import DarkModeButton from "@/components/DarkModeButton.vue";
 import { ref, computed } from "vue";
 import { useRoute } from "vue-router";
 import { useMutationObserver } from "@vueuse/core";
-import { useTheme, useModal, useMontants } from "@/hooks";
+import { useTheme, useModal, useMontants, useToast } from "@/hooks";
 
 const { bgPrimary, colorPrimary, bgSecondary, colorSecondary } = useTheme();
 const $modal = useModal();
 const $route = useRoute();
 const { addMontant } = useMontants();
+const { toast, openToast } = useToast();
 
 const selectedRoute = computed(() => $route.name);
 const isOpen = computed(() => $modal.isOpen.value);
@@ -111,6 +118,11 @@ const toggleStatus = ref(true);
 const montant = ref(0);
 
 const send = () => {
+  if (!montant.value || montant.value === 0) {
+    openToast('Vous devez remplir un montant');
+    return;
+  }
+
   addMontant(montant.value, toggleStatus.value);
 
   montant.value = 0;

@@ -92,11 +92,12 @@
 import { ref } from 'vue';
 import { IonToggle, IonItem, IonInput, IonLabel } from '@ionic/vue';
 import Toggle from '@/components/Toggle.vue';
-import { useTheme, useModal, useMontants } from '@/hooks';
+import { useTheme, useModal, useMontants, useToast } from '@/hooks';
 
 const { bgPrimary, colorPrimary, bgSecondary, colorSecondary } = useTheme();
 const $modal = useModal();
 const { montantsList: montants, montantsHeader: header, delMontant, addMontant } = useMontants();
+const { openToast } = useToast();
 
 const pageTitle = 'Mon budget';
 
@@ -104,6 +105,11 @@ const toggleStatus = ref(true);
 const montant = ref('');
 
 const addMontantLocal = () => {
+  if (!montant.value || montant.value === 0) {
+    openToast('Vous devez remplir un montant');
+    return;
+  }
+
   addMontant(montant.value, toggleStatus.value);
 
   montant.value = 0;

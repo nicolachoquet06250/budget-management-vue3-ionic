@@ -9,17 +9,73 @@
     </ion-header>
 
     <ion-content padding="">
-      Ceci est la page À propos.
+      <form>
+        <ion-list>
+          <ion-item>
+              <ion-label position="floating" 
+                         :color="isDark ? 'light' : 'dark'"> Salaire </ion-label>
+
+              <ion-input inputmode="numeric" :value="salaire" @input="setSalaire($event.target.value ? parseInt($event.target.value) : 0)"></ion-input>
+          </ion-item>
+
+          <ion-item>
+              <ion-label position="floating" 
+                         :color="isDark ? 'light' : 'dark'"> Date d'arrivé du salaire </ion-label>
+
+              <ion-input inputmode="numeric" :value="salaireDayNumber" @input="setSalaireDayNumber($event.target.value ? parseInt($event.target.value) : 1)"></ion-input>
+          </ion-item>
+
+          <ion-item>
+              <ion-button :style="saveButtonTheme()" @click="saveSettings" size="small">
+                  Sauvegarder
+              </ion-button>
+          </ion-item>
+        </ion-list>
+      </form>
     </ion-content>
   </ion-app>
 </template>
 
 <script setup>
-  import { useTheme } from '@/hooks';
+  import { IonList, IonItem, IonLabel, IonInput, IonContent, IonApp, IonHeader, IonToolbar, IonTitle, IonMenuButton, IonButton } from '@ionic/vue';
+  import { ref } from 'vue';
+  import { useMutationObserver } from '@vueuse/core';
+  import { useTheme, useSettings } from '@/hooks';
 
   const { bgPrimary, colorPrimary, bgSecondary, colorSecondary } = useTheme();
+  const { salaire, setSalaire, salaireDayNumber, setSalaireDayNumber, saveSettings } = useSettings();
+
+  const el = ref(document.querySelector("html"));
+  const isDark = ref(document.querySelector("html").classList.contains("dark"));
 
   const pageTitle = 'Paramètres';
+
+  useMutationObserver(
+    el,
+    (mutations) => {
+      const mutation = mutations[0];
+
+      if (!mutation) return;
+
+      isDark.value = document.querySelector("html").classList.contains("dark");
+    },
+    { attributes: true }
+  );
+
+  const darkModeButtonTheme = () => ({
+    "--margin-right": "5px",
+    "--margin-left": "10px",
+    "--color": colorSecondary[isDark.value],
+    '--ion-color-md-primary': isDark.value ? '#222428' : '#0000FF',
+    '--ion-color-primary': isDark.value ? '#222428' : '#0000FF',
+    '--ion-color-md-primary-contrast': 'white',
+    '--ion-color-primary-contrast': 'white'
+  });
+
+  const saveButtonTheme = () => ({
+    'margin-left': '20px',
+    ...darkModeButtonTheme()
+  });
 </script>
 
 <style>

@@ -112,14 +112,17 @@
 import { ref } from 'vue';
 import { IonToggle, IonItem, IonInput, IonLabel } from '@ionic/vue';
 import Toggle from '@/components/Toggle.vue';
-import { useTheme, useModal, useMontants, useToast } from '@/hooks';
+import { useTheme, useModal, useMontants, useToast, useSettings } from '@/hooks';
 
 const { bgPrimary, colorPrimary, bgSecondary, colorSecondary } = useTheme();
 const { openModal } = useModal();
 const { montantsList: montants, montantsHeader: header, total, delMontant, addMontant, actualizeMontants } = useMontants();
 const { openToast } = useToast();
+const { createSalaire } = useSettings();
 
 actualizeMontants();
+
+createSalaire();
 
 const pageTitle = 'Mon budget';
 

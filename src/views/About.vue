@@ -73,18 +73,32 @@
   });
 
   const saveButtonTheme = () => ({
-    'margin-left': '20px',
+    'margin-left': '30px',
     ...darkModeButtonTheme()
   });
 </script>
 
-<style>
+<style lang="scss" scoped>
+  ion-app {
+    .input-wrapper {
+      display: flex;
+      justify-content: start;
+    }
+
+    .item {
+      padding-left: 0;
+    }
+  }
   .toolbar-content {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
     flex-wrap: nowrap;
+  }
+
+  ion-title {
+    max-width: 100%;
   }
 </style>
 
@@ -149,9 +163,5 @@
       --ion-background-md-color: v-bind(bgSecondary[false]);
       --ion-background-color: v-bind(bgSecondary[false]);
     }
-  }
-
-  ion-title {
-    max-width: 100%;
   }
 </style>

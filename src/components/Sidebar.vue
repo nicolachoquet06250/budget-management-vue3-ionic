@@ -1,5 +1,5 @@
 <template>
-    <ion-menu side="start" type="push" menu-id="menu" content-id="main">
+    <ion-menu side="start" type="overlay" menu-id="menu" content-id="main" ref="sidebar">
         <ion-header>
             <ion-toolbar color="danger" :style="sidebarToolbarTheme()">
                 <ion-title> Menu </ion-title>
@@ -31,6 +31,7 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { useRoute } from "vue-router";
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem } from '@ionic/vue';
 import DarkModeButton from "@/components/DarkModeButton.vue";
 import { useMutationObserver } from "@vueuse/core";
 import { useTheme } from "@/hooks";

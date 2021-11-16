@@ -1,7 +1,5 @@
-import { computed, ref, reactive } from 'vue';
+import { computed, reactive } from 'vue';
 import { PLUS } from './montant-list';
-
-const isCreateSoldModalOpen = ref(false);
 
 const updateSoldModal = reactive({
     opened: false,
@@ -10,37 +8,38 @@ const updateSoldModal = reactive({
     id: null
 });
 
-export const useCreateSoldModal = () => {
-    return {
-        isOpen: computed(() => isCreateSoldModalOpen.value),
-        
-        setOpen(v) {
-            isCreateSoldModalOpen.value = v;
-        }
-    }
-}
-
-export const useUpdateSoldModal = () => {
-    return {
-        isOpen: computed(() => updateSoldModal.opened),
-        sold: computed(() => updateSoldModal.sold),
-        status: computed(() => updateSoldModal.status),
-        id: computed(() => updateSoldModal.id),
-        
-        setOpen(v) {
-            updateSoldModal.opened = v;
-        },
-
-        setSold(sold) {
-            updateSoldModal.sold = sold;
-        },
-
-        setStatus(status) {
-            updateSoldModal.status = status;
-        },
-
-        setId(id) {
-            updateSoldModal.id = id;
-        }
-    };
+const setOpen = v => {
+    updateSoldModal.opened = v;
 };
+
+const setSold = v => {
+    updateSoldModal.sold = v;
+};
+
+const setStatus = v => {
+    updateSoldModal.status = v;
+};
+
+const setId = v => {
+    updateSoldModal.id = v;
+};
+
+export const useModal = () => ({
+    ...Object.keys(updateSoldModal).reduce((r, c) => ({...r, [c]: computed(() => updateSoldModal[c])}), {}),
+    
+    setOpen,
+    setSold,
+    setStatus,
+    setId,
+
+    openModal(id, sold, status) {
+        setSold(sold);
+        setStatus(status);
+        setId(id);
+        setOpen(true);
+    },
+
+    closeModal() {
+        setOpen(false);
+    }
+});

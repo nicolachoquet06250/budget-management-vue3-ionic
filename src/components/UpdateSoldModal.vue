@@ -48,28 +48,27 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 import { IonLabel, IonList, IonItem, IonButton, IonInput, IonToggle } from '@ionic/vue';
 import Toggle from '@/components/Toggle.vue';
-import { useUpdateSoldModal, useMontants, useToast, useTheme } from '@/hooks';
+import { useModal, useMontants, useToast, useTheme } from '@/hooks';
 import { useMutationObserver } from "@vueuse/core";
 
 const { bgPrimary, colorPrimary, colorSecondary } = useTheme();
 const { updateMontant } = useMontants();
 const { openToast } = useToast();
-const $modal = useUpdateSoldModal();
+const { opened, id, status, sold, closeModal } = useModal();
 
 const el = ref(document.querySelector("html"));
 const isDark = ref(document.querySelector("html").classList.contains("dark"));
 
-const isOpen = computed(() => $modal.isOpen.value);
-const toggleStatus = ref($modal.status.value);
-const montant = ref($modal.sold.value);
+const toggleStatus = ref(status.value);
+const montant = ref(sold.value);
 
-watch(isOpen, () => {
-    toggleStatus.value = $modal.status.value;
-    montant.value = $modal.sold.value;
-})
+watch(opened, () => {
+    toggleStatus.value = status.value;
+    montant.value = sold.value;
+});
 
 const darkModeButtonTheme = () => ({
   "--margin-right": "5px",
@@ -90,12 +89,8 @@ const modalToolbarTheme = () => ({
 
 const modalStyle = () => ({
   '--height': '100%', 
-  display: (!isOpen.value ? 'none' : 'block')
+  display: (!opened.value ? 'none' : 'block')
 });
-
-const closeModal = () => {
-  $modal.setOpen(false);
-};
 
 const sendSold = () => {
   if (!montant.value || montant.value === 0) {
@@ -103,8 +98,7 @@ const sendSold = () => {
     return;
   }
 
-  console.log(toggleStatus.value);
-  updateMontant($modal.id.value, montant.value, toggleStatus.value);
+  updateMontant(id.value, montant.value, toggleStatus.value);
   closeModal();
 };
 

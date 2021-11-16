@@ -33,4 +33,4 @@ export const useToast = () => ({
             setOpened(false);
         }, duration);
     }
-})
+});

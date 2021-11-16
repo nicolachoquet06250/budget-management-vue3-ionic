@@ -90,23 +90,19 @@ const updateMontant = (id, sold, status) => {
 export const useMontants = () => ({
     montantsHeader: computed(() => montantsHeader.value),
     montantsList: computed(() => montantsList.value),
-    total: computed(() => {
-        const { total } = montantsList.value.reduce((r, c) => {
-            if (r.cmp === 0) {
-                return { 
-                    cmp: (r.cmp + 1), 
-                    total: c.sold 
-                };
-            }
-            
+    total: computed(() => montantsList.value.reduce((r, c) => {
+        if (r.cmp === 0) {
             return { 
                 cmp: (r.cmp + 1), 
-                total: (c.status ? r.total + c.sold : r.total - c.sold)
+                total: c.sold 
             };
-        }, {cmp: 0, total: 0});
-
-        return total;
-    }),
+        }
+        
+        return { 
+            cmp: (r.cmp + 1), 
+            total: (c.status ? r.total + c.sold : r.total - c.sold)
+        };
+    }, {cmp: 0, total: 0}).total),
 
     addMontant,
     delMontant,

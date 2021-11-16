@@ -6,8 +6,6 @@
       <Sidebar />
 
       <UpdateSoldModal />
-      
-      <CreateSoldModal />
 
       <ion-toast
         :is-open="toast.opened"
@@ -21,7 +19,6 @@
 <script setup>
 import { IonToast } from '@ionic/vue';
 import Sidebar from "@/components/Sidebar.vue";
-import CreateSoldModal from '@/components/CreateSoldModal.vue';
 import UpdateSoldModal from '@/components/UpdateSoldModal.vue';
 import { useToast, useTheme } from "@/hooks";
 

@@ -112,10 +112,10 @@
 import { ref } from 'vue';
 import { IonToggle, IonItem, IonInput, IonLabel } from '@ionic/vue';
 import Toggle from '@/components/Toggle.vue';
-import { useTheme, useUpdateSoldModal, useMontants, useToast } from '@/hooks';
+import { useTheme, useModal, useMontants, useToast } from '@/hooks';
 
 const { bgPrimary, colorPrimary, bgSecondary, colorSecondary } = useTheme();
-const $modal = useUpdateSoldModal();
+const { openModal } = useModal();
 const { montantsList: montants, montantsHeader: header, total, delMontant, addMontant, actualizeMontants } = useMontants();
 const { openToast } = useToast();
 
@@ -137,13 +137,6 @@ const addMontantLocal = () => {
   montant.value = '';
   toggleStatus.value = true;
 };
-
-const openModal = (id, sold, status) => {
-  $modal.setSold(sold);
-  $modal.setStatus(status);
-  $modal.setId(id);
-  $modal.setOpen(true);
-}
 </script>
 
 <style>

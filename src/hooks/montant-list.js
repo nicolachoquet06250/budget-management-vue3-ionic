@@ -43,7 +43,8 @@ const actualizeMontants = () => {
         localStorage.setItem('solds', JSON.stringify([
             {
                 sold: (lastMonthFinalSold < 0 ? Math.abs(lastMonthFinalSold) : lastMonthFinalSold), 
-                status: lastMonthFinalSold > 0
+                status: lastMonthFinalSold > 0,
+                description: 'Solde restant du mois précédent'
             }
         ]));
 
@@ -52,7 +53,7 @@ const actualizeMontants = () => {
         localStorage.setItem('solds-month', montantsMonth.value);
     }
 };
-const addMontant = (sold, status) => {
+const addMontant = (sold, status, description) => {
     if (localStorage.getItem('solds-month') === null) {
         localStorage.setItem('solds-month', new Date().getMonth());
     }
@@ -64,7 +65,7 @@ const addMontant = (sold, status) => {
         JSON.stringify(
             [
                 ...montantsList.value, 
-                { sold, status }
+                { sold, status, description }
             ]
         )
     );
@@ -79,11 +80,11 @@ const delMontant = id => {
     ]
     localStorage.setItem('solds', JSON.stringify(montantsList.value));
 };
-const updateMontant = (id, sold, status) => {
+const updateMontant = (id, sold, status, description) => {
     montantsList.value = [
         ...montantsList.value
         .map((_, i) => i)
-        .reduce((r, c) => c === id ? [...r, { sold, status }] : [...r, montantsList.value[c]], [])
+        .reduce((r, c) => c === id ? [...r, { sold, status, description }] : [...r, montantsList.value[c]], [])
     ]
 };
 

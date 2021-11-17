@@ -80,11 +80,6 @@
 
 <style lang="scss" scoped>
   ion-app {
-    .input-wrapper {
-      display: flex;
-      justify-content: start;
-    }
-
     .item {
       padding-left: 0;
     }

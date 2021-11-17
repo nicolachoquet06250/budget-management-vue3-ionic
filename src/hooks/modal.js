@@ -5,6 +5,7 @@ const updateSoldModal = reactive({
     opened: false,
     sold: 0,
     status: PLUS,
+    description: '',
     id: null
 });
 
@@ -20,6 +21,10 @@ const setStatus = v => {
     updateSoldModal.status = v;
 };
 
+const setDescription = v => {
+    updateSoldModal.description = v;
+};
+
 const setId = v => {
     updateSoldModal.id = v;
 };
@@ -30,12 +35,14 @@ export const useModal = () => ({
     setOpen,
     setSold,
     setStatus,
+    setDescription,
     setId,
 
-    openModal(id, sold, status) {
+    openModal(id, sold, status, description) {
         setSold(sold);
         setStatus(status);
         setId(id);
+        setDescription(description);
         setOpen(true);
     },
 

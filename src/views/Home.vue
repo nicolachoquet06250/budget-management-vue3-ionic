@@ -46,7 +46,7 @@
               'padding-top': '5px',
               'padding-bottom': '5px'
             }">
-              <ion-button color="medium" size="small" @click="openModal(id, montant.sold, montant.status)">
+              <ion-button color="medium" size="small" @click="openModal(id, montant.sold, montant.status, montant.description)">
                 <ion-icon src="https://unpkg.com/ionicons@5.5.2/dist/svg/pencil-outline.svg" 
                           style="color: black;"></ion-icon>
               </ion-button>
@@ -83,9 +83,20 @@
       <ion-grid>
         <ion-row>
           <ion-col>
+            <ion-item style="width: 100%">
+              <ion-label position="floating"
+                         :color="isDark ? 'light' : 'dark'">Description</ion-label>
+
+              <ion-textarea :auto-grow="true" inputmode="text" :value="description" @input="description = $event.target.value ? $event.target.value : ''"></ion-textarea>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+
+        <ion-row>
+          <ion-col>
             <ion-item>
               <ion-label position="floating" 
-                          :color="isDark ? 'light' : 'dark'"> Montant </ion-label>
+                         :color="isDark ? 'light' : 'dark'"> Montant </ion-label>
               <ion-input inputmode="numeric" :value="montant" @input="montant = $event.target.value ? parseInt($event.target.value) : ''"></ion-input>
             </ion-item>
           </ion-col>
@@ -110,7 +121,7 @@
 <script setup>
 // @ is an alias to /src
 import { ref } from 'vue';
-import { IonToggle, IonItem, IonInput, IonLabel } from '@ionic/vue';
+import { IonToggle, IonItem, IonInput, IonLabel, IonTextarea } from '@ionic/vue';
 import Toggle from '@/components/Toggle.vue';
 import { useTheme, useModal, useMontants, useToast, useSettings } from '@/hooks';
 
@@ -128,17 +139,25 @@ const pageTitle = 'Mon budget';
 
 const toggleStatus = ref(true);
 const montant = ref('');
+const description = ref('');
 
 const addMontantLocal = () => {
+  console.log(JSON.stringify({
+    description: description.value,
+    montant: montant.value,
+    status: toggleStatus.value
+  }));
+
   if (!montant.value || montant.value === 0) {
     openToast('Vous devez remplir un montant');
     return;
   }
 
-  addMontant(montant.value, toggleStatus.value);
+  addMontant(montant.value, toggleStatus.value, description.value);
 
   montant.value = '';
   toggleStatus.value = true;
+  description.value = '';
 };
 </script>
 

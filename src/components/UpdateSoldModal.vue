@@ -21,7 +21,9 @@
                         <ion-item>
                             <ion-label position="floating" 
                                        :color="isDark ? 'light' : 'dark'"> Montant </ion-label>
-                            <ion-input inputmode="numeric" :value="montant" @input="montant = $event.target.value ? parseInt($event.target.value) : ''"></ion-input>
+                            
+                            <ion-input inputmode="numeric" :value="montant" 
+                                       @input="montant = $event.target.value ? parseInt($event.target.value) : ''"></ion-input>
                         </ion-item>
 
                         <ion-item>
@@ -30,6 +32,15 @@
                             <IonToggle style="display: none;"></IonToggle>
 
                             <Toggle v-model="toggleStatus" value="+" />
+                        </ion-item>
+
+                        <ion-item>
+                            <ion-label position="floating"
+                                       :color="isDark ? 'light' : 'dark'">Description</ion-label>
+
+                            <ion-textarea :auto-grow="true" inputmode="text" :autofocus="true" ref="textarea"
+                                          :value="description" 
+                                          @input="description = $event.target.value ? $event.target.value : ''"></ion-textarea>
                         </ion-item>
 
                         <ion-item>
@@ -49,7 +60,7 @@
 
 <script setup>
 import { ref, watch } from 'vue';
-import { IonLabel, IonList, IonItem, IonButton, IonInput, IonToggle } from '@ionic/vue';
+import { IonLabel, IonList, IonItem, IonButton, IonInput, IonToggle, IonTextarea } from '@ionic/vue';
 import Toggle from '@/components/Toggle.vue';
 import { useModal, useMontants, useToast, useTheme } from '@/hooks';
 import { useMutationObserver } from "@vueuse/core";
@@ -57,17 +68,30 @@ import { useMutationObserver } from "@vueuse/core";
 const { bgPrimary, colorPrimary, colorSecondary } = useTheme();
 const { updateMontant } = useMontants();
 const { openToast } = useToast();
-const { opened, id, status, sold, closeModal } = useModal();
+const { opened, id, status, sold, description: desc, closeModal } = useModal();
 
 const el = ref(document.querySelector("html"));
 const isDark = ref(document.querySelector("html").classList.contains("dark"));
+const textarea = ref(null);
 
 const toggleStatus = ref(status.value);
 const montant = ref(sold.value);
+const description = ref(desc.value);
 
 watch(opened, () => {
+    description.value = desc.value;
     toggleStatus.value = status.value;
     montant.value = sold.value;
+
+    if (opened.value) {
+        if (description.value) {
+            textarea.value.$el.parentElement.parentElement.parentElement.classList.add('item-input-has-value');
+        } else {
+            textarea.value.$el.parentElement.parentElement.parentElement.classList.remove('item-input-has-value');
+        }
+        // item item-md item-label-floating hydrated item-interactive item-textarea item-input
+        // item item-md item-label-floating hydrated item-interactive item-textarea item-input item-input-has-value
+    }
 });
 
 const darkModeButtonTheme = () => ({
@@ -98,7 +122,7 @@ const sendSold = () => {
     return;
   }
 
-  updateMontant(id.value, montant.value, toggleStatus.value);
+  updateMontant(id.value, montant.value, toggleStatus.value, description.value);
   closeModal();
 };
 

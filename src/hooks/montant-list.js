@@ -17,7 +17,18 @@ export const MOINS = false;
 */
 
 const montantsMonth = ref(localStorage.getItem('solds-month') === null ? new Date().getMonth() : parseInt(localStorage.getItem('solds-month')));
-const montantsList = ref(localStorage.getItem('solds') === null ? [] : JSON.parse(localStorage.getItem('solds')));
+const montantsList = ref(
+    localStorage.getItem('solds') === null 
+        ? [] 
+            : [
+                ...JSON.parse(localStorage.getItem('solds'))
+                    .map(s => {
+                        if ('folded' in s) return s;
+                        return { ...s, folded: false };
+                    }
+                )
+            ]
+);
 
 const montantsHeader = ref([
     'Montant',
@@ -60,16 +71,11 @@ const addMontant = (sold, status, description) => {
 
     actualizeMontants();
 
-    localStorage.setItem(
-        'solds', 
-        JSON.stringify(
-            [
-                ...montantsList.value, 
-                { sold, status, description }
-            ]
-        )
-    );
-    montantsList.value = JSON.parse(localStorage.getItem('solds'));
+    montantsList.value = [
+        ...montantsList.value, 
+        { sold, status, description, folded: false }
+    ];
+    localStorage.setItem('solds', JSON.stringify(montantsList.value));
 };
 const delMontant = id => {
     console.log(id);
@@ -80,12 +86,13 @@ const delMontant = id => {
     ]
     localStorage.setItem('solds', JSON.stringify(montantsList.value));
 };
-const updateMontant = (id, sold, status, description) => {
+const updateMontant = (id, sold, status, description, folded) => {
     montantsList.value = [
         ...montantsList.value
         .map((_, i) => i)
-        .reduce((r, c) => c === id ? [...r, { sold, status, description }] : [...r, montantsList.value[c]], [])
-    ]
+        .reduce((r, c) => c === id ? [...r, { sold, status, description, folded }] : [...r, montantsList.value[c]], [])
+    ];
+    localStorage.setItem('solds', JSON.stringify(montantsList.value));
 };
 
 export const useMontants = () => ({

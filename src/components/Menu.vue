@@ -3,31 +3,25 @@
         <router-link :to="{name: 'Budget'}" :style="linkTheme('Budget')">Mon budget</router-link>
         <router-link :to="{name: 'Settings'}" :style="linkTheme('Settings')">Paramètres</router-link>
 
-        <DarkModeButton style="--margin-right: 5px; --margin-left: 5px; --color: white" @darkChange="handleDarkChange" />
+        <DarkModeButton style="--margin-right: 5px; --margin-left: 5px; --color: white" />
     </nav>
 </template>
 
 <script setup>
-import { useRoute } from 'vue-router';
 import DarkModeButton from './DarkModeButton.vue';
-import { useTheme } from '@/hooks';
-import { useDark } from '@vueuse/core';
+import { useRoute } from 'vue-router';
+import { useTheme, useDark } from '@/hooks';
 
 const $route = useRoute();
+const { isDark } = useDark();
 
 const selectedRoute = $route.name;
-
-const _isDark = useDark();
 
 const { colorPrimary, colorSecondary } = useTheme();
 
 const linkTheme = name => ({
-    color: (selectedRoute === name ? colorPrimary[_isDark.value] : colorSecondary[_isDark.value])
+    color: (selectedRoute === name ? colorPrimary[isDark.value] : colorSecondary[isDark.value])
 });
-
-const handleDarkChange = ({ detail: { isDark } }) => {
-    _isDark.value = isDark;
-}
 </script>
 
 <style lang="scss">

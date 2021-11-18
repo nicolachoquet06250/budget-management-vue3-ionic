@@ -6,6 +6,8 @@
 
         <ion-title> {{ pageTitle }} </ion-title>
       </ion-toolbar>
+
+      <DateHeader />
     </ion-header>
 
     <ion-content padding="" id="main">
@@ -25,37 +27,57 @@
 
         <template v-if="montants.length > 0">
           <ion-row v-for="(montant, id) in montants" :key="montant">
+            <div style="display: flex; flex-direction: row; width: 100%;">
+              <div :style="{
+                color: (montant.status ? 'green' : 'red'),
+                display: 'flex', 
+                'flex-direction': 'column', 
+                'align-items': 'center', 
+                'justify-content': 'center', 
+                flex: 1, 
+                width: 'auto'
+              }" >
+                {{ montant.sold }} €
+              </div>
+
+              <div :style="{
+                display: 'flex', 
+                'align-items': 'center', 
+                'justify-content': 'space-around', 
+                flex: 1, 
+                width: '50%',
+                'padding-top': '5px',
+                'padding-bottom': '5px'
+              }">
+                <ion-button color="medium" size="small" @click="openModal(id, montant.sold, montant.status, montant.description)">
+                  <ion-icon src="https://unpkg.com/ionicons@5.5.2/dist/svg/pencil-outline.svg" 
+                            style="color: black;"></ion-icon>
+                </ion-button>
+
+                <ion-button color="medium" size="small" @click="delMontant(id)">
+                  <ion-icon src="https://unpkg.com/ionicons@5.5.2/dist/svg/trash-outline.svg" 
+                            style="color: black;"></ion-icon>
+                </ion-button>
+
+                <template v-if="montant.description">
+                  <ion-button color="medium" size="small" @click="updateMontant(id, montant.sold, montant.status, montant.description, !montant.folded);">
+                    <ion-icon :src="montant.folded ? 'https://unpkg.com/ionicons@5.5.2/dist/svg/chevron-down-outline.svg' : 'https://unpkg.com/ionicons@5.5.2/dist/svg/chevron-up-outline.svg'"
+                              style="color: black;"></ion-icon>
+                  </ion-button>
+                </template>
+              </div>
+            </div>
+
             <div :style="{
-              color: (montant.status ? 'green' : 'red'),
+              color: (isDark ? 'white' : 'black'),
               display: 'flex', 
               'flex-direction': 'column', 
-              'align-items': 'center', 
+              'align-items': 'start', 
               'justify-content': 'center', 
               flex: 1, 
-              width: 'auto'
-            }" >
-              {{ montant.sold }} €
-            </div>
-
-            <div :style="{
-              display: 'flex', 
-              'align-items': 'center', 
-              'justify-content': 'space-around', 
-              flex: 1, 
-              width: '50%',
-              'padding-top': '5px',
-              'padding-bottom': '5px'
-            }">
-              <ion-button color="medium" size="small" @click="openModal(id, montant.sold, montant.status, montant.description)">
-                <ion-icon src="https://unpkg.com/ionicons@5.5.2/dist/svg/pencil-outline.svg" 
-                          style="color: black;"></ion-icon>
-              </ion-button>
-
-              <ion-button color="medium" size="small" @click="delMontant(id)">
-                <ion-icon src="https://unpkg.com/ionicons@5.5.2/dist/svg/trash-outline.svg" 
-                          style="color: black;"></ion-icon>
-              </ion-button>
-            </div>
+              width: 'auto',
+              display: (montant.folded ? 'unset' : 'none')
+            }" v-html="montant.description?.replace(/\n/g, '<br />')"></div>
           </ion-row>
 
           <ion-row style="height: 60px; font-size: 30px;">
@@ -120,16 +142,18 @@
 
 <script setup>
 // @ is an alias to /src
+import Toggle from '@/components/Toggle.vue';
+import DateHeader from '@/components/DateHeader.vue';
 import { ref } from 'vue';
 import { IonToggle, IonItem, IonInput, IonLabel, IonTextarea } from '@ionic/vue';
-import Toggle from '@/components/Toggle.vue';
-import { useTheme, useModal, useMontants, useToast, useSettings } from '@/hooks';
+import { useTheme, useModal, useMontants, useToast, useSettings, useDark } from '@/hooks';
 
 const { bgPrimary, colorPrimary, bgSecondary, colorSecondary } = useTheme();
 const { openModal } = useModal();
-const { montantsList: montants, montantsHeader: header, total, delMontant, addMontant, actualizeMontants } = useMontants();
+const { montantsList: montants, montantsHeader: header, total, delMontant, addMontant, updateMontant, actualizeMontants } = useMontants();
 const { openToast } = useToast();
 const { createSalaire } = useSettings();
+const { isDark } = useDark();
 
 actualizeMontants();
 
@@ -142,12 +166,6 @@ const montant = ref('');
 const description = ref('');
 
 const addMontantLocal = () => {
-  console.log(JSON.stringify({
-    description: description.value,
-    montant: montant.value,
-    status: toggleStatus.value
-  }));
-
   if (!montant.value || montant.value === 0) {
     openToast('Vous devez remplir un montant');
     return;

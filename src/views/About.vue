@@ -38,29 +38,13 @@
 
 <script setup>
   import { IonList, IonItem, IonLabel, IonInput, IonContent, IonApp, IonHeader, IonToolbar, IonTitle, IonMenuButton, IonButton } from '@ionic/vue';
-  import { ref } from 'vue';
-  import { useMutationObserver } from '@vueuse/core';
-  import { useTheme, useSettings } from '@/hooks';
+  import { useTheme, useSettings, useDark } from '@/hooks';
 
   const { bgPrimary, colorPrimary, bgSecondary, colorSecondary } = useTheme();
   const { salaire, setSalaire, salaireDayNumber, setSalaireDayNumber, saveSettings } = useSettings();
-
-  const el = ref(document.querySelector("html"));
-  const isDark = ref(document.querySelector("html").classList.contains("dark"));
+  const { isDark } = useDark();
 
   const pageTitle = 'Paramètres';
-
-  useMutationObserver(
-    el,
-    (mutations) => {
-      const mutation = mutations[0];
-
-      if (!mutation) return;
-
-      isDark.value = document.querySelector("html").classList.contains("dark");
-    },
-    { attributes: true }
-  );
 
   const darkModeButtonTheme = () => ({
     "--margin-right": "5px",

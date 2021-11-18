@@ -29,20 +29,17 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import DarkModeButton from "@/components/DarkModeButton.vue";
+import { computed } from 'vue';
 import { useRoute } from "vue-router";
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem } from '@ionic/vue';
-import DarkModeButton from "@/components/DarkModeButton.vue";
-import { useMutationObserver } from "@vueuse/core";
-import { useTheme } from "@/hooks";
+import { useTheme, useDark } from "@/hooks";
 
 const { bgPrimary, colorPrimary, bgSecondary, colorSecondary } = useTheme();
 const $route = useRoute();
+const { isDark } = useDark();
 
 const selectedRoute = computed(() => $route.name);
-
-const el = ref(document.querySelector("html"));
-const isDark = ref(document.querySelector("html").classList.contains("dark"));
 
 const sidebarToolbarTheme = () => ({
   "--ion-color-md-danger": bgPrimary[isDark.value],
@@ -72,17 +69,5 @@ const linkTheme = (name) => ({
       ? (isDark.value ? 'white' : 'gray')
       : colorSecondary[isDark.value],
 });
-
-useMutationObserver(
-  el,
-  (mutations) => {
-    const mutation = mutations[0];
-
-    if (!mutation) return;
-
-    isDark.value = document.querySelector("html").classList.contains("dark");
-  },
-  { attributes: true }
-);
 
 </script>

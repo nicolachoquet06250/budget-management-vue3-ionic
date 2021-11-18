@@ -59,19 +59,17 @@
 </template>
 
 <script setup>
+import Toggle from '@/components/Toggle.vue';
 import { ref, watch } from 'vue';
 import { IonLabel, IonList, IonItem, IonButton, IonInput, IonToggle, IonTextarea } from '@ionic/vue';
-import Toggle from '@/components/Toggle.vue';
-import { useModal, useMontants, useToast, useTheme } from '@/hooks';
-import { useMutationObserver } from "@vueuse/core";
+import { useModal, useMontants, useToast, useTheme, useDark } from '@/hooks';
 
 const { bgPrimary, colorPrimary, colorSecondary } = useTheme();
 const { updateMontant } = useMontants();
 const { openToast } = useToast();
 const { opened, id, status, sold, description: desc, closeModal } = useModal();
+const { isDark } = useDark();
 
-const el = ref(document.querySelector("html"));
-const isDark = ref(document.querySelector("html").classList.contains("dark"));
 const textarea = ref(null);
 
 const toggleStatus = ref(status.value);
@@ -89,8 +87,6 @@ watch(opened, () => {
         } else {
             textarea.value.$el.parentElement.parentElement.parentElement.classList.remove('item-input-has-value');
         }
-        // item item-md item-label-floating hydrated item-interactive item-textarea item-input
-        // item item-md item-label-floating hydrated item-interactive item-textarea item-input item-input-has-value
     }
 });
 
@@ -125,18 +121,6 @@ const sendSold = () => {
   updateMontant(id.value, montant.value, toggleStatus.value, description.value);
   closeModal();
 };
-
-useMutationObserver(
-  el,
-  (mutations) => {
-    const mutation = mutations[0];
-
-    if (!mutation) return;
-
-    isDark.value = document.querySelector("html").classList.contains("dark");
-  },
-  { attributes: true }
-);
 </script>
 
 <style lang="scss" scoped>

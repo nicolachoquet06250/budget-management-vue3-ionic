@@ -2,6 +2,7 @@
 node_modules
 /dist
 /android
+/apks
 
 
 # local env files

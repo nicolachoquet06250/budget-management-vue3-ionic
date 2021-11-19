@@ -18,7 +18,7 @@
 </script>
 
 <style lang="scss" scoped>
-    ion-header + ion-header > ion-toolbar ion-title {
+    ion-header > ion-toolbar:nth-child(2) ion-title {
         --ion-color-md-primary-contrast: white;
         --ion-color-primary-contrast: white;
 

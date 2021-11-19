@@ -17,13 +17,40 @@
 </template>
 
 <script setup>
-import { IonToast } from '@ionic/vue';
 import Sidebar from "@/components/Sidebar.vue";
 import UpdateSoldModal from '@/components/UpdateSoldModal.vue';
-import { useToast, useTheme } from "@/hooks";
+import { useToast, useTheme/*, useDataBase*/ } from "@/hooks";
 
 const { bgPrimary, colorPrimary, bgSecondary, colorSecondary } = useTheme();
 const { toast } = useToast();
+/*const { createDb, line, get } = useDataBase('software');
+
+(async () => {
+    await createDb({
+        id: 'number',
+        name: 'string',
+        version: 'number'
+    });
+
+    await line({
+        id: 0,
+        name: 'Logiciel 1',
+        version: 1
+    });
+
+    await line({
+        id: 1,
+        name: 'Logiciel 1',
+        version: 2
+    });
+
+    const firstLine = await get({
+      id: 1
+    });
+
+    console.log(firstLine);
+})();*/
+
 </script>
 
 <style lang="scss" scoped>

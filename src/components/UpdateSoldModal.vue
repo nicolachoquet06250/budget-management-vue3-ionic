@@ -61,7 +61,6 @@
 <script setup>
 import Toggle from '@/components/Toggle.vue';
 import { ref, watch } from 'vue';
-import { IonLabel, IonList, IonItem, IonButton, IonInput, IonToggle, IonTextarea } from '@ionic/vue';
 import { useModal, useMontants, useToast, useTheme, useDark } from '@/hooks';
 
 const { bgPrimary, colorPrimary, colorSecondary } = useTheme();
@@ -83,9 +82,9 @@ watch(opened, () => {
 
     if (opened.value) {
         if (description.value) {
-            textarea.value.$el.parentElement.parentElement.parentElement.classList.add('item-input-has-value');
+            textarea.value.parentElement.parentElement.parentElement.classList.add('item-input-has-value');
         } else {
-            textarea.value.$el.parentElement.parentElement.parentElement.classList.remove('item-input-has-value');
+            textarea.value.parentElement.parentElement.parentElement.classList.remove('item-input-has-value');
         }
     }
 });

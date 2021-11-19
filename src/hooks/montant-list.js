@@ -1,7 +1,11 @@
 import { ref, computed } from 'vue';
+import { useStorage } from './external-device-storage';
 
 export const PLUS = true;
 export const MOINS = false;
+
+const soldsMonth = useStorage('solds-month');
+const solds = useStorage('solds');
 
 /*
 [
@@ -16,27 +20,37 @@ export const MOINS = false;
 ]
 */
 
-const montantsMonth = ref(localStorage.getItem('solds-month') === null ? new Date().getMonth() : parseInt(localStorage.getItem('solds-month')));
-const montantsList = ref(
-    localStorage.getItem('solds') === null 
-        ? [] 
-            : [
-                ...JSON.parse(localStorage.getItem('solds'))
-                    .map(s => {
-                        if ('folded' in s) return s;
-                        return { ...s, folded: false };
-                    }
-                )
-            ]
-);
+const montantsMonth = ref(null);
+const montantsList = ref([]);
 
 const montantsHeader = ref([
     'Montant',
     'Actions' 
 ]);
 
-const actualizeMontants = () => {
-    if (new Date().getMonth() !== montantsMonth.value) {
+const getSoldsMonth = async () => (await soldsMonth.exist()) ? new Date().getMonth() : parseInt(await soldsMonth.get());
+
+(async () => {
+    if (montantsMonth.value === null) {
+        montantsMonth.value = await getSoldsMonth();
+    }
+
+    if (montantsList.value.length === 0) {
+        montantsList.value = !(await solds.exist()) 
+            ? [] 
+                : [
+                    ...(await solds.get())
+                        .map(s => {
+                            if ('folded' in s) return s;
+                            return { ...s, folded: false };
+                        }
+                    )
+                ];
+    }
+})();
+
+const actualizeMontants = async () => {
+    if (new Date().getMonth() !== await getSoldsMonth()) {
         const { total: lastMonthFinalSold } = montantsList.value.reduce((r, c) => {
             if (r.cmp === 0) {
                 return { 
@@ -51,48 +65,52 @@ const actualizeMontants = () => {
             };
         }, {cmp: 0, total: 0});
         
-        localStorage.setItem('solds', JSON.stringify([
-            {
-                sold: (lastMonthFinalSold < 0 ? Math.abs(lastMonthFinalSold) : lastMonthFinalSold), 
-                status: lastMonthFinalSold > 0,
-                description: 'Solde restant du mois précédent'
-            }
-        ]));
+        await solds.set([{
+            sold: (lastMonthFinalSold < 0 ? Math.abs(lastMonthFinalSold) : lastMonthFinalSold), 
+            status: lastMonthFinalSold > 0,
+            description: 'Solde restant du mois précédent'
+        }]);
 
-        montantsList.value = JSON.parse(localStorage.getItem('solds'));
+        montantsList.value = await solds.get();
         montantsMonth.value = new Date().getMonth();
-        localStorage.setItem('solds-month', montantsMonth.value);
+        
+        await soldsMonth.set(montantsMonth.value);
     }
 };
-const addMontant = (sold, status, description) => {
-    if (localStorage.getItem('solds-month') === null) {
-        localStorage.setItem('solds-month', new Date().getMonth());
+
+const addMontant = async (sold, status, description) => {
+    if (await soldsMonth.exist()) {
+        await soldsMonth.set(new Date().getMonth())
     }
 
-    actualizeMontants();
+    await actualizeMontants();
 
     montantsList.value = [
         ...montantsList.value, 
         { sold, status, description, folded: false }
     ];
-    localStorage.setItem('solds', JSON.stringify(montantsList.value));
+    
+    await solds.set(montantsList.value);
 };
-const delMontant = id => {
-    console.log(id);
+
+const delMontant = async id => {
     montantsList.value = [
         ...montantsList.value
             .map((_, i) => i)
             .reduce((r, c) => c === id ? r : [...r, montantsList.value[c]], [])
-    ]
-    localStorage.setItem('solds', JSON.stringify(montantsList.value));
+    ];
+
+    await solds.set(montantsList.value);
 };
-const updateMontant = (id, sold, status, description, folded) => {
+
+const updateMontant = async (id, sold, status, description, folded) => {
     montantsList.value = [
         ...montantsList.value
         .map((_, i) => i)
         .reduce((r, c) => c === id ? [...r, { sold, status, description, folded }] : [...r, montantsList.value[c]], [])
     ];
-    localStorage.setItem('solds', JSON.stringify(montantsList.value));
+
+    await solds.set(montantsList.value);
 };
 
 export const useMontants = () => ({

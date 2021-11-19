@@ -124,7 +124,7 @@
           </ion-col>
 
           <ion-col>
-            <IonToggle style="display: none;"></IonToggle>
+            <ion-toggle style="display: none;"></ion-toggle>
 
             <Toggle v-model="toggleStatus" value="+" />
           </ion-col>
@@ -145,7 +145,7 @@
 import Toggle from '@/components/Toggle.vue';
 import DateHeader from '@/components/DateHeader.vue';
 import { ref } from 'vue';
-import { IonToggle, IonItem, IonInput, IonLabel, IonTextarea } from '@ionic/vue';
+import { IonToggle } from '@ionic/vue';
 import { useTheme, useModal, useMontants, useToast, useSettings, useDark } from '@/hooks';
 
 const { bgPrimary, colorPrimary, bgSecondary, colorSecondary } = useTheme();

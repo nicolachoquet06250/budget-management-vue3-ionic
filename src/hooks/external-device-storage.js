@@ -1,6 +1,6 @@
 import { ref } from 'vue';
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
-import { Storage } from '@capacitor/storage';
+import { Storage as CapacitorStorage } from '@capacitor/storage';
 import { Drivers, Storage as IonicStorage } from '@ionic/storage';
 import IonicSecureStorageDriver from '@ionic-enterprise/secure-storage/driver';
 // import { SQLite } from '@ionic-enterprise/secure-storage';
@@ -50,7 +50,7 @@ export const useFilePath = async path => {
 };
 
 export const useStorage = key => {
-    const { get, set, remove } = Storage;
+    const { get, set, remove } = CapacitorStorage;
 
     return {
        /**
@@ -92,14 +92,42 @@ export const useDataBase = name => {
     const database = ref(null);
     const fields = ref({});
 
+    const match = (str, regex) => {
+        let m;
+        let cmp = 0;
+      
+        while ((m = regex.exec(str)) !== null) {
+            // This is necessary to avoid infinite loops with zero-width matches
+            if (m.index === regex.lastIndex) {
+                regex.lastIndex++;
+            }
+      
+            // The result can be accessed through the `m`-variable.
+            m.forEach(() => {
+                // console.log(`Found match, group ${groupIndex}: ${match}`);
+              cmp++;
+            });
+        }
+        
+        return cmp > 0;
+    };
+
     const getFieldIdReducer = name => 
         (r, c) => (c === name && r.find === false) || r.find === true 
                 ? { cmp: r.cmp, find: true } 
                     : { cmp: r.cmp + 1, find: false };
 
+    const fieldIdReducerBaseObject = { cmp: 0, find: false };
+
+    const getFieldId = field => Object.keys(fields.value).reduce(
+        getFieldIdReducer(field), 
+        { ...fieldIdReducerBaseObject }
+    ).cmp;
+
+    const idAlradyExist = (array, id) => array.reduce((r, c) => c.id === id ? true : r, false);
+
     return {
-        async createDb(_fields) {
-            console.log(name, _fields);
+        async getDB(_fields) {
             fields.value = _fields;
             
             database.value = new IonicStorage({
@@ -117,22 +145,19 @@ export const useDataBase = name => {
 
             await database.value.create();
 
-            console.log(database.value);
-
             database.value.set('fields', Object.keys(_fields));
             database.value.set('types', Object.keys(_fields).map(k => _fields[k]));
         },
 
         async line(values) {
             const _fields = Object.keys(fields.value);
+            let oldValues = [];
 
             try {
-                let oldValues = await database.value.get('values');
-
-                if (!oldValues) {
-                    oldValues = [];
-                }
-
+                oldValues = await database.value.get('values') ?? [];
+            } catch (e) {
+                console.error(e);
+            } finally {
                 const newValuesArray = _fields.map(k => {
                     if (values[k] !== null && values[k] !== undefined) return values[k];
                     throw new Error(`Le champ ${k} n'est pas renseigné !`);
@@ -143,43 +168,135 @@ export const useDataBase = name => {
                     { cmp: 0, find: false }
                 );
 
-                const { updated, values: mergedValues } = oldValues.reduce((r, c) => {
-                    if (c[fieldId] !== newValuesArray[fieldId]) {
-                        return { ...r, values: [...r.values, c] };
-                    }
- 
-                    return { updated: true, values: [...r.values, newValuesArray] };
-                }, { values: [], updated: false });
+                const { updated, values: mergedValues } = oldValues.reduce(
+                    (r, c) => 
+                        c[fieldId] !== newValuesArray[fieldId] 
+                            ? { ...r, values: [...r.values, c] } 
+                                : { updated: true, values: [...r.values, newValuesArray] }, 
+                    { values: [], updated: false }
+                );
 
                 if (!updated) {
                     mergedValues.push(newValuesArray);
                 }
 
                 database.value.set('values', mergedValues);
-            } catch (e) {
-                console.error(e);
             }
         },
 
-        async get(where) {
+        async empty() {
+            return (await database.value.get('values')) === null;
+        },
+
+        async get(where = {}) {
             const _fields = Object.keys(fields.value);
             const values = await database.value.get('values');
 
-            const { cmp: fieldId } = _fields.reduce(
-                getFieldIdReducer('id'), 
-                { cmp: 0, find: false }
-            );
+            const getValueReducer = (k, where, fieldId) => 
+                (r, value) => 
+                    Object.keys(where) === 0 || (where[k] instanceof RegExp && match(String(value[fieldId]), where[k])) || value[fieldId] === where[k] 
+                        ? [...r, value] 
+                            : r;
+
+            return (
+                await Object.keys(where).reduce(async (r, k) => {
+                        return values.reduce(
+                            getValueReducer(k, where, getFieldId(k)), 
+                            [...(await r)]
+                        )
+                    }, (Object.keys(where).length === 0 ? values : []))
+                ).map(r => {
+                    return r.reduce((r, c) => 
+                        ({
+                            cmp: r.cmp + 1, 
+                            obj: { 
+                                ...r.obj, 
+                                [_fields[r.cmp]]: c 
+                            }
+                        }), 
+                        { cmp: 0, obj: {} }
+                    ).obj
+                }).reduce((r, c) => 
+                        idAlradyExist(r, c.id) 
+                            ? r : [...r, c], []);
+        },
+
+        async remove(where = {}) {
+            const _fields = Object.keys(fields.value);
+            const values = await database.value.get('values');
+
+            const getValueReducer = (k, where, fieldId) => 
+                (r, value) => 
+                    Object.keys(where) === 0 || (where[k] instanceof RegExp && match(String(value[fieldId]), where[k])) || value[fieldId] === where[k] 
+                        ? r 
+                            : [...r, value];
+
+            const newValues = ((await (Object.keys(where)).reduce(async (r, k) => {
+                return values.reduce(
+                    getValueReducer(k, where, getFieldId(k)), 
+                    [...(await r)]
+                )
+            }, (Object.keys(where).length === 0 ? values : [])))).map(r => 
+                    r.reduce((r, c) => 
+                        ({
+                            cmp: r.cmp + 1, 
+                            obj: { 
+                                ...r.obj, 
+                                [_fields[r.cmp]]: c 
+                            }
+                        }), 
+                        { cmp: 0, obj: {} }
+                    ).obj).reduce((r, c) => 
+                        idAlradyExist(r, c.id) 
+                            ? r : [...r, c], []);
             
-            let result = [];
-            if ('id' in where) {
-                result = values.reduce((r, value) => {
-                    if (value[fieldId] === where.id) {
-                        return [...r, value];
-                    }
-                    return r;
-                }, []);
-                console.log(result);
+            await database.value.set('values', newValues.map(v => Object.keys(v).map(k => v[k])));
+
+            return newValues;
+        },
+
+        async metadata(key, value = null) {
+            if (['values', 'fields', 'types'].indexOf(key) !== -1) {
+                throw new Error(`La clé ${key} est interdite car c'est un mot clé`);
             }
+
+            if (value === null) {
+                let v;
+                try {
+                    v = await database.value.get(key);
+                } catch (e) {
+                    v = null;
+                }
+                return v;
+            }
+            await database.value.set(key, value);
+            return value;
+        },
+
+        startBy(str) {
+            return new RegExp(`^${str}`, 'g');
+        },
+
+        greaterThan(num) {
+            const exploded = String(num).split('');
+            const regex = exploded.map((n, i) => `[${i === exploded.length - 1 ? n + 1 : n}-9]`).join('');
+            return new RegExp(`^${regex}+$`, 'gm');
+        },
+
+        numberBetween(min, max) {
+            return new RegExp(`^([${min + 1}-${max - 2}]|${max - 1})$`, 'gm');
+        },
+
+        numberBetweenIncluded(min, max) {
+            return new RegExp(`^([${min}-${max - 1}]|${max})$`, 'gm');
         }
     };
+};
+
+export const SOLDS_MODEL = {
+    id: 'number',
+    sold: 'number',
+    status: 'boolean',
+    description: 'string',
+    folded: 'boolean'
 };

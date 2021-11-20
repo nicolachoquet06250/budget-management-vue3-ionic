@@ -61,15 +61,19 @@
 <script setup>
 import Toggle from '@/components/Toggle.vue';
 import { ref, watch } from 'vue';
-import { useModal, useMontants, useToast, useTheme, useDark } from '@/hooks';
+import { useModal, useMontants, useToast, useTheme, useDark, useDataBase, SOLDS_MODEL } from '@/hooks';
 
 const { bgPrimary, colorPrimary, colorSecondary } = useTheme();
 const { updateMontant } = useMontants();
 const { openToast } = useToast();
 const { opened, id, status, sold, description: desc, closeModal } = useModal();
 const { isDark } = useDark();
+const { get, getDB } = useDataBase('solds');
+
+getDB(SOLDS_MODEL);
 
 const textarea = ref(null);
+const sended = ref(false);
 
 const toggleStatus = ref(status.value);
 const montant = ref(sold.value);
@@ -81,6 +85,8 @@ watch(opened, () => {
     montant.value = sold.value;
 
     if (opened.value) {
+        sended.value = false;
+
         if (description.value) {
             textarea.value.parentElement.parentElement.parentElement.classList.add('item-input-has-value');
         } else {
@@ -111,14 +117,19 @@ const modalStyle = () => ({
   display: (!opened.value ? 'none' : 'block')
 });
 
-const sendSold = () => {
+const sendSold = async () => {
   if (!montant.value || montant.value === 0) {
     openToast('Vous devez remplir un montant');
     return;
   }
 
-  updateMontant(id.value, montant.value, toggleStatus.value, description.value);
-  closeModal();
+  const [{ folded }] = await get({ id: id.value });
+
+  if (!sended.value) {
+    updateMontant(id.value, montant.value, toggleStatus.value, description.value, folded);
+    sended.value = true;
+    closeModal();
+  }
 };
 </script>
 

@@ -9,7 +9,10 @@
     "npm:ionic:android:create": "npm run build && npx cap add android && echo 'Votre projet android est prêt, ouvrez le dans Android-Studio.'",
     "npm:ionic:android:update": "npm run build && npx cap copy && echo 'Votre projet android est prêt, ouvrez le dans Android-Studio.'",
     "pnpm:ionic:android:create": "pnpm run build && npx cap add android && echo 'Votre projet android est prêt, ouvrez le dans Android-Studio.'",
-    "pnpm:ionic:android:update": "pnpm run build && npx cap copy && echo 'Votre projet android est prêt, ouvrez le dans Android-Studio.'"
+    "pnpm:ionic:android:update": "pnpm run build && npx cap copy && echo 'Votre projet android est prêt, ouvrez le dans Android-Studio.'",
+    "import:apk-repo": "git clone https://github.com/nicolachoquet06250/budget-management-apk.git apks",
+    "lin:publish:apk:release": "PACKAGE_VERSION=$(cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g');cp android/app/release/app-release.apk apks/budget-management-${PACKAGE_VERSION/./\"-\"}.apk;git status;git commit -am \"Version $PACKAGE_VERSION de l'application budget-management\";git push;",
+    "win:publish:apk:release": "$PACKAGE_VERSION=(Get-Content package.json) -join \"`n\" | ConvertFrom-Json | Select -ExpandProperty \"version\";$PACKAGE_VERSION=$PACKAGE_VERSION.replace('.', '-');cp android/app/release/app-release.apk apks/budget-management-$PACKAGE_VERSION.apk;git status;git commit -am \"Version $PACKAGE_VERSION de l'application budget-management\";git push;"
   },
   "dependencies": {
     "@capacitor/android": "^3.3.0",

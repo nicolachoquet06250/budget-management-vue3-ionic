@@ -23,10 +23,10 @@ import { useToast, useTheme/*, useDataBase*/ } from "@/hooks";
 
 const { bgPrimary, colorPrimary, bgSecondary, colorSecondary } = useTheme();
 const { toast } = useToast();
-/*const { createDb, line, get } = useDataBase('software');
+//const { getDB, line, get, startBy, numberBetweenIncluded, greaterThan } = useDataBase('software');
 
-(async () => {
-    await createDb({
+/*(async () => {
+    await getDB({
         id: 'number',
         name: 'string',
         version: 'number'
@@ -44,11 +44,22 @@ const { toast } = useToast();
         version: 2
     });
 
-    const firstLine = await get({
-      id: 1
-    });
+    console.log('id: 1', await get({
+        id: 1
+    }));
 
-    console.log(firstLine);
+    console.log('name start by "Logiciel "', await get({
+        id: 0,
+        name: startBy('Logiciel ')
+    }));
+
+    console.log('version between include 1 and 2', await get({
+        version: numberBetweenIncluded(1, 2)
+    }));
+
+    console.log('version greater than 0', await get({
+      version: greaterThan(0)
+    }));
 })();*/
 
 </script>

@@ -26,7 +26,7 @@
         </ion-row>
 
         <template v-if="montants.length > 0">
-          <ion-row v-for="(montant, id) in montants" :key="montant">
+          <ion-row v-for="montant in montants" :key="montant">
             <div style="display: flex; flex-direction: row; width: 100%;">
               <div :style="{
                 color: (montant.status ? 'green' : 'red'),
@@ -49,18 +49,18 @@
                 'padding-top': '5px',
                 'padding-bottom': '5px'
               }">
-                <ion-button color="medium" size="small" @click="openModal(id, montant.sold, montant.status, montant.description)">
+                <ion-button color="medium" size="small" @click="openModal(montant.id, montant.sold, montant.status, montant.description)">
                   <ion-icon src="https://unpkg.com/ionicons@5.5.2/dist/svg/pencil-outline.svg" 
                             style="color: black;"></ion-icon>
                 </ion-button>
 
-                <ion-button color="medium" size="small" @click="delMontant(id)">
+                <ion-button color="medium" size="small" @click="delMontant(montant.id)">
                   <ion-icon src="https://unpkg.com/ionicons@5.5.2/dist/svg/trash-outline.svg" 
                             style="color: black;"></ion-icon>
                 </ion-button>
 
                 <template v-if="montant.description">
-                  <ion-button color="medium" size="small" @click="updateMontant(id, montant.sold, montant.status, montant.description, !montant.folded);">
+                  <ion-button color="medium" size="small" @click="updateMontant(montant.id, montant.sold, montant.status, montant.description, !montant.folded);">
                     <ion-icon :src="montant.folded ? 'https://unpkg.com/ionicons@5.5.2/dist/svg/chevron-down-outline.svg' : 'https://unpkg.com/ionicons@5.5.2/dist/svg/chevron-up-outline.svg'"
                               style="color: black;"></ion-icon>
                   </ion-button>
